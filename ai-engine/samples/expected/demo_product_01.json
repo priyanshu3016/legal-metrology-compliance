@@ -1,0 +1,480 @@
+{
+  "success": true,
+  "image_path": "demo_product_01.jpg",
+  "image_id": "demo_product_01",
+  "timestamp": "2026-09-05T12:48:57.464093+00:00",
+  "processing_time_ms": 45,
+  "raw_ocr": {
+    "full_text": "Parle-G Gold Biscuits\nManufactured by: Parle Products Pvt. Ltd.\nNet Wt: 100g\nMRP Rs. 20.00 (incl. of all taxes)\nMfg Date: 03/2026\nCustomer Care: 1800-22-2211\nCountry of Origin: India\nBest Before 6 months from Mfg\nUnit Sale Price: Rs. 0.20 / g",
+    "line_count": 9,
+    "avg_confidence": 0.97,
+    "ocr_results": [
+      {
+        "text": "Parle-G Gold Biscuits",
+        "confidence": 0.99,
+        "bbox": [
+          [
+            15,
+            20
+          ],
+          [
+            350,
+            20
+          ],
+          [
+            350,
+            60
+          ],
+          [
+            15,
+            60
+          ]
+        ]
+      },
+      {
+        "text": "Manufactured by: Parle Products Pvt. Ltd.",
+        "confidence": 0.96,
+        "bbox": [
+          [
+            20,
+            70
+          ],
+          [
+            500,
+            70
+          ],
+          [
+            500,
+            110
+          ],
+          [
+            20,
+            110
+          ]
+        ]
+      },
+      {
+        "text": "Net Wt: 100g",
+        "confidence": 0.98,
+        "bbox": [
+          [
+            20,
+            120
+          ],
+          [
+            180,
+            120
+          ],
+          [
+            180,
+            145
+          ],
+          [
+            20,
+            145
+          ]
+        ]
+      },
+      {
+        "text": "MRP Rs. 20.00 (incl. of all taxes)",
+        "confidence": 0.98,
+        "bbox": [
+          [
+            20,
+            155
+          ],
+          [
+            360,
+            155
+          ],
+          [
+            360,
+            185
+          ],
+          [
+            20,
+            185
+          ]
+        ]
+      },
+      {
+        "text": "Mfg Date: 03/2026",
+        "confidence": 0.97,
+        "bbox": [
+          [
+            20,
+            195
+          ],
+          [
+            220,
+            195
+          ],
+          [
+            220,
+            220
+          ],
+          [
+            20,
+            220
+          ]
+        ]
+      },
+      {
+        "text": "Customer Care: 1800-22-2211",
+        "confidence": 0.97,
+        "bbox": [
+          [
+            20,
+            230
+          ],
+          [
+            420,
+            230
+          ],
+          [
+            420,
+            255
+          ],
+          [
+            20,
+            255
+          ]
+        ]
+      },
+      {
+        "text": "Country of Origin: India",
+        "confidence": 0.99,
+        "bbox": [
+          [
+            20,
+            265
+          ],
+          [
+            280,
+            265
+          ],
+          [
+            280,
+            290
+          ],
+          [
+            20,
+            290
+          ]
+        ]
+      },
+      {
+        "text": "Best Before 6 months from Mfg",
+        "confidence": 0.95,
+        "bbox": [
+          [
+            20,
+            300
+          ],
+          [
+            340,
+            300
+          ],
+          [
+            340,
+            325
+          ],
+          [
+            20,
+            325
+          ]
+        ]
+      },
+      {
+        "text": "Unit Sale Price: Rs. 0.20 / g",
+        "confidence": 0.94,
+        "bbox": [
+          [
+            20,
+            335
+          ],
+          [
+            310,
+            335
+          ],
+          [
+            310,
+            360
+          ],
+          [
+            20,
+            360
+          ]
+        ]
+      }
+    ]
+  },
+  "detections": [
+    {
+      "field": "product_name",
+      "label": "Product Name",
+      "value": "Parle-G Gold Biscuits",
+      "raw_match": "Parle-G Gold Biscuits",
+      "confidence": 0.99,
+      "bbox": [
+        [
+          15,
+          20
+        ],
+        [
+          350,
+          20
+        ],
+        [
+          350,
+          60
+        ],
+        [
+          15,
+          60
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "manufacturer_packer_importer",
+      "label": "Manufacturer / Packer / Importer",
+      "value": "Parle Products Pvt. Ltd., V.S. Khandekar Marg, Vile Parle East, Mumbai 400057",
+      "raw_match": "Manufactured by: Parle Products Pvt. Ltd.",
+      "confidence": 0.96,
+      "bbox": [
+        [
+          20,
+          70
+        ],
+        [
+          500,
+          70
+        ],
+        [
+          500,
+          110
+        ],
+        [
+          20,
+          110
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "net_quantity",
+      "label": "Net Quantity",
+      "value": "100 g",
+      "raw_match": "Net Wt: 100g",
+      "confidence": 0.98,
+      "bbox": [
+        [
+          20,
+          120
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          180,
+          145
+        ],
+        [
+          20,
+          145
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "mrp",
+      "label": "Maximum Retail Price",
+      "value": "20.00",
+      "raw_match": "MRP Rs. 20.00 (incl. of all taxes)",
+      "confidence": 0.98,
+      "bbox": [
+        [
+          20,
+          155
+        ],
+        [
+          360,
+          155
+        ],
+        [
+          360,
+          185
+        ],
+        [
+          20,
+          185
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "manufacturing_date",
+      "label": "Manufacturing / Packing Date",
+      "value": "03/2026",
+      "raw_match": "Mfg Date: 03/2026",
+      "confidence": 0.97,
+      "bbox": [
+        [
+          20,
+          195
+        ],
+        [
+          220,
+          195
+        ],
+        [
+          220,
+          220
+        ],
+        [
+          20,
+          220
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "consumer_care",
+      "label": "Consumer Care Details",
+      "value": "1800-22-2211 | cs@parle.biz",
+      "raw_match": "Customer Care: 1800-22-2211",
+      "confidence": 0.97,
+      "bbox": [
+        [
+          20,
+          230
+        ],
+        [
+          420,
+          230
+        ],
+        [
+          420,
+          255
+        ],
+        [
+          20,
+          255
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "country_of_origin",
+      "label": "Country of Origin",
+      "value": "India",
+      "raw_match": "Country of Origin: India",
+      "confidence": 0.99,
+      "bbox": [
+        [
+          20,
+          265
+        ],
+        [
+          280,
+          265
+        ],
+        [
+          280,
+          290
+        ],
+        [
+          20,
+          290
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "best_before",
+      "label": "Best Before / Use By",
+      "value": "6 months from manufacture",
+      "raw_match": "Best Before 6 months from Mfg",
+      "confidence": 0.95,
+      "bbox": [
+        [
+          20,
+          300
+        ],
+        [
+          340,
+          300
+        ],
+        [
+          340,
+          325
+        ],
+        [
+          20,
+          325
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "unit_sale_price",
+      "label": "Unit Sale Price",
+      "value": "\u20b90.20 / g",
+      "raw_match": "Unit Sale Price: Rs. 0.20 / g",
+      "confidence": 0.94,
+      "bbox": [
+        [
+          20,
+          335
+        ],
+        [
+          310,
+          335
+        ],
+        [
+          310,
+          360
+        ],
+        [
+          20,
+          360
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    }
+  ],
+  "readability": {
+    "avg_text_height_px": 28.5,
+    "min_text_height_px": 18.0,
+    "max_text_height_px": 42.0,
+    "small_text_count": 0,
+    "image_resolution": [
+      800,
+      600
+    ],
+    "estimated_readability": "good"
+  },
+  "metadata": {
+    "ocr_engine": "paddleocr",
+    "preprocessing_applied": [
+      "load",
+      "grayscale",
+      "clahe"
+    ],
+    "scale_factor": 1.0,
+    "demo_mode": true,
+    "demo_note": "Activated pre-verified ground truth for presentation reliability."
+  },
+  "errors": []
+}
