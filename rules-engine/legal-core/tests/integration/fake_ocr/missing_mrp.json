@@ -1,0 +1,59 @@
+{
+  "inspection_id": "ocr-sim-002-missing-mrp",
+  "overall_confidence": 0.91,
+  "image_quality": "good",
+  "raw_text": "Good Day Butter Cookies Net Weight 100 g Mfg. Date: 05/2026 Mfd. by: Britannia Industries Ltd., Kolkata - 700017 Toll Free: 1800-425-4449 feedback@britindia.com",
+  "fields": {
+    "product_name": {
+      "value": "Good Day Butter Cookies",
+      "confidence": 0.94,
+      "raw_text": "Good Day Butter Cookies",
+      "bounding_box": {"x": 100, "y": 40, "width": 320, "height": 45}
+    },
+    "net_quantity": {
+      "value": {
+        "numeric": 100.0,
+        "unit": "g"
+      },
+      "confidence": 0.93,
+      "raw_text": "Net Weight 100 g",
+      "bounding_box": {"x": 120, "y": 120, "width": 140, "height": 30}
+    },
+    "mrp": null,
+    "manufacturer": {
+      "value": {
+        "name": "Britannia Industries Ltd.",
+        "address": "5/1A Hungerford Street, Kolkata, West Bengal - 700017",
+        "role": "manufacturer"
+      },
+      "confidence": 0.90,
+      "raw_text": "Mfd. by: Britannia Industries Ltd., Kolkata - 700017",
+      "bounding_box": {"x": 50, "y": 240, "width": 420, "height": 55}
+    },
+    "packer": null,
+    "importer": null,
+    "manufacturing_date": {
+      "value": {
+        "month": 5,
+        "year": 2026,
+        "format": "MM/YYYY"
+      },
+      "confidence": 0.88,
+      "raw_text": "Mfg. Date: 05/2026",
+      "bounding_box": {"x": 50, "y": 320, "width": 160, "height": 25}
+    },
+    "consumer_care": {
+      "value": {
+        "phone": "1800-425-4449",
+        "email": "feedback@britindia.com",
+        "address": "Consumer Service Cell, Britannia Industries Ltd., Kolkata"
+      },
+      "confidence": 0.87,
+      "raw_text": "Toll Free: 1800-425-4449 feedback@britindia.com",
+      "bounding_box": {"x": 50, "y": 370, "width": 380, "height": 35}
+    },
+    "country_of_origin": null
+  },
+  "quantity_qualifiers_detected": [],
+  "is_imported_hint": false
+}

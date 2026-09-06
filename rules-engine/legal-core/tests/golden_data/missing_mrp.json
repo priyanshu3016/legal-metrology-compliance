@@ -1,0 +1,59 @@
+{
+  "inspection_id": "insp-002-missing-mrp",
+  "overall_confidence": 0.90,
+  "image_quality": "good",
+  "raw_text": "Parle-G Gold Biscuits Net Wt. 200g Mfd. by: Parle Products Pvt. Ltd., Mumbai - 400057 Mfg. Date: 08/2026 Toll Free: 1800-22-1929, cs@parle.biz",
+  "fields": {
+    "product_name": {
+      "value": "Parle-G Gold Biscuits",
+      "confidence": 0.93,
+      "raw_text": "Parle-G Gold Biscuits",
+      "bounding_box": {"x": 120, "y": 50, "width": 300, "height": 40}
+    },
+    "net_quantity": {
+      "value": {
+        "numeric": 200.0,
+        "unit": "g"
+      },
+      "confidence": 0.94,
+      "raw_text": "Net Wt. 200g",
+      "bounding_box": {"x": 150, "y": 400, "width": 100, "height": 25}
+    },
+    "mrp": null,
+    "manufacturer": {
+      "value": {
+        "name": "Parle Products Pvt. Ltd.",
+        "address": "Vile Parle (East), Mumbai, Maharashtra - 400057",
+        "role": "manufacturer"
+      },
+      "confidence": 0.91,
+      "raw_text": "Mfd. by: Parle Products Pvt. Ltd., Mumbai - 400057",
+      "bounding_box": {"x": 50, "y": 500, "width": 400, "height": 60}
+    },
+    "packer": null,
+    "importer": null,
+    "manufacturing_date": {
+      "value": {
+        "month": 8,
+        "year": 2026,
+        "format": "MM/YYYY"
+      },
+      "confidence": 0.89,
+      "raw_text": "Mfg. Date: 08/2026",
+      "bounding_box": {"x": 50, "y": 560, "width": 180, "height": 20}
+    },
+    "consumer_care": {
+      "value": {
+        "phone": "1800-22-1929",
+        "email": "cs@parle.biz",
+        "address": "Consumer Grievance Cell, Mumbai"
+      },
+      "confidence": 0.87,
+      "raw_text": "Toll Free: 1800-22-1929, cs@parle.biz",
+      "bounding_box": {"x": 50, "y": 620, "width": 350, "height": 30}
+    },
+    "country_of_origin": null
+  },
+  "quantity_qualifiers_detected": [],
+  "is_imported_hint": false
+}
