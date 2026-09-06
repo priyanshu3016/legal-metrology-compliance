@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing
+.pytest_cache/
+
+# Environments and secrets
+.env
+.venv/
+venv/
+
+# Generated databases
+*.sqlite3
+*.db
+**/chroma_db/
+
+# Generated runtime files
+**/uploads/
+**/annotated/
+**/reports/
