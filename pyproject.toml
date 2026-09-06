@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+testpaths = [
+    "ai-engine/tests",
+    "rules-engine/legal-core/tests",
+    "integration/tests",
+]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

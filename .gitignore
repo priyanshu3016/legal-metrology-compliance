@@ -29,3 +29,7 @@ venv/
 
 # Generated output files
 output*.txt
+
+# Runtime test databases
+**/data/
+**/test_chroma_db/

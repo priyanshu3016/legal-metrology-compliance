@@ -1,0 +1,2 @@
+-r ai-engine/requirements.txt
+-r rules-engine/legal-core/requirements.txt
