@@ -1,0 +1,402 @@
+{
+  "success": true,
+  "image_path": "demo_product_06.jpg",
+  "image_id": "demo_product_06",
+  "timestamp": "2026-09-05T12:48:57.464600+00:00",
+  "processing_time_ms": 45,
+  "raw_ocr": {
+    "full_text": "Kurkure Masala Munch\nMfd by: PepsiCo India Holdings Pvt. Ltd.\nNet Weight 85g\nMfg: 02/2026\nConsumer Cell: 1800-22-4020\nCountry of Origin: India\nBest Before 4 months",
+    "line_count": 7,
+    "avg_confidence": 0.97,
+    "ocr_results": [
+      {
+        "text": "Kurkure Masala Munch",
+        "confidence": 0.99,
+        "bbox": [
+          [
+            20,
+            30
+          ],
+          [
+            380,
+            30
+          ],
+          [
+            380,
+            70
+          ],
+          [
+            20,
+            70
+          ]
+        ]
+      },
+      {
+        "text": "Mfd by: PepsiCo India Holdings Pvt. Ltd.",
+        "confidence": 0.95,
+        "bbox": [
+          [
+            20,
+            85
+          ],
+          [
+            460,
+            85
+          ],
+          [
+            460,
+            120
+          ],
+          [
+            20,
+            120
+          ]
+        ]
+      },
+      {
+        "text": "Net Weight 85g",
+        "confidence": 0.98,
+        "bbox": [
+          [
+            20,
+            135
+          ],
+          [
+            190,
+            135
+          ],
+          [
+            190,
+            160
+          ],
+          [
+            20,
+            160
+          ]
+        ]
+      },
+      {
+        "text": "Mfg: 02/2026",
+        "confidence": 0.96,
+        "bbox": [
+          [
+            20,
+            175
+          ],
+          [
+            180,
+            175
+          ],
+          [
+            180,
+            200
+          ],
+          [
+            20,
+            200
+          ]
+        ]
+      },
+      {
+        "text": "Consumer Cell: 1800-22-4020",
+        "confidence": 0.96,
+        "bbox": [
+          [
+            20,
+            215
+          ],
+          [
+            360,
+            215
+          ],
+          [
+            360,
+            240
+          ],
+          [
+            20,
+            240
+          ]
+        ]
+      },
+      {
+        "text": "Country of Origin: India",
+        "confidence": 0.98,
+        "bbox": [
+          [
+            20,
+            250
+          ],
+          [
+            260,
+            250
+          ],
+          [
+            260,
+            275
+          ],
+          [
+            20,
+            275
+          ]
+        ]
+      },
+      {
+        "text": "Best Before 4 months",
+        "confidence": 0.94,
+        "bbox": [
+          [
+            20,
+            285
+          ],
+          [
+            290,
+            285
+          ],
+          [
+            290,
+            310
+          ],
+          [
+            20,
+            310
+          ]
+        ]
+      }
+    ]
+  },
+  "detections": [
+    {
+      "field": "product_name",
+      "label": "Product Name",
+      "value": "Kurkure Masala Munch",
+      "raw_match": "Kurkure Masala Munch",
+      "confidence": 0.99,
+      "bbox": [
+        [
+          20,
+          30
+        ],
+        [
+          380,
+          30
+        ],
+        [
+          380,
+          70
+        ],
+        [
+          20,
+          70
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "manufacturer_packer_importer",
+      "label": "Manufacturer / Packer / Importer",
+      "value": "PepsiCo India Holdings Pvt. Ltd., Gurugram, Haryana",
+      "raw_match": "Mfd by: PepsiCo India Holdings Pvt. Ltd.",
+      "confidence": 0.95,
+      "bbox": [
+        [
+          20,
+          85
+        ],
+        [
+          460,
+          85
+        ],
+        [
+          460,
+          120
+        ],
+        [
+          20,
+          120
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "net_quantity",
+      "label": "Net Quantity",
+      "value": "85 g",
+      "raw_match": "Net Weight 85g",
+      "confidence": 0.98,
+      "bbox": [
+        [
+          20,
+          135
+        ],
+        [
+          190,
+          135
+        ],
+        [
+          190,
+          160
+        ],
+        [
+          20,
+          160
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "mrp",
+      "label": "Maximum Retail Price",
+      "value": null,
+      "raw_match": null,
+      "confidence": 0.0,
+      "bbox": null,
+      "source": "ocr",
+      "status": "not_found"
+    },
+    {
+      "field": "manufacturing_date",
+      "label": "Manufacturing / Packing Date",
+      "value": "02/2026",
+      "raw_match": "Mfg: 02/2026",
+      "confidence": 0.96,
+      "bbox": [
+        [
+          20,
+          175
+        ],
+        [
+          180,
+          175
+        ],
+        [
+          180,
+          200
+        ],
+        [
+          20,
+          200
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "consumer_care",
+      "label": "Consumer Care Details",
+      "value": "1800-22-4020",
+      "raw_match": "Consumer Cell: 1800-22-4020",
+      "confidence": 0.96,
+      "bbox": [
+        [
+          20,
+          215
+        ],
+        [
+          360,
+          215
+        ],
+        [
+          360,
+          240
+        ],
+        [
+          20,
+          240
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "country_of_origin",
+      "label": "Country of Origin",
+      "value": "India",
+      "raw_match": "Country of Origin: India",
+      "confidence": 0.98,
+      "bbox": [
+        [
+          20,
+          250
+        ],
+        [
+          260,
+          250
+        ],
+        [
+          260,
+          275
+        ],
+        [
+          20,
+          275
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "best_before",
+      "label": "Best Before / Use By",
+      "value": "4 months from packaging",
+      "raw_match": "Best Before 4 months",
+      "confidence": 0.94,
+      "bbox": [
+        [
+          20,
+          285
+        ],
+        [
+          290,
+          285
+        ],
+        [
+          290,
+          310
+        ],
+        [
+          20,
+          310
+        ]
+      ],
+      "source": "demo_fallback",
+      "status": "found"
+    },
+    {
+      "field": "unit_sale_price",
+      "label": "Unit Sale Price",
+      "value": null,
+      "raw_match": null,
+      "confidence": 0.0,
+      "bbox": null,
+      "source": "ocr",
+      "status": "not_found"
+    }
+  ],
+  "readability": {
+    "avg_text_height_px": 24.0,
+    "min_text_height_px": 14.0,
+    "max_text_height_px": 38.0,
+    "small_text_count": 0,
+    "image_resolution": [
+      700,
+      500
+    ],
+    "estimated_readability": "good"
+  },
+  "metadata": {
+    "ocr_engine": "paddleocr",
+    "preprocessing_applied": [
+      "load",
+      "grayscale",
+      "clahe"
+    ],
+    "scale_factor": 1.0,
+    "demo_mode": true,
+    "demo_note": "Activated pre-verified ground truth for presentation reliability."
+  },
+  "errors": []
+}
