@@ -41,6 +41,26 @@ export function InspectionProvider({ children }) {
 
   // Creates and logs a real inspection record from the user's input
   const createInspection = (meta = {}, images = []) => {
+    // If real inspection result from backend API is provided, store directly without mock overrides
+    if (meta._fromApi) {
+      const year = new Date().getFullYear();
+      const rand = Math.floor(Math.random() * 9000) + 1000;
+      const today = meta.date || new Date().toISOString().split('T')[0];
+      const now = meta.time || new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+      const newRecord = {
+        id: meta.id || `INS-${year}-${rand}`,
+        date: today,
+        time: now,
+        timestamp: `${today} ${now}`,
+        images: images.map((img, i) => img.preview || img.name || `panel_${i + 1}.jpg`),
+        ...meta,
+      };
+      setInspections(prev => [newRecord, ...prev]);
+      setCurrentInspection(newRecord);
+      setUploadedImages(images);
+      return newRecord;
+    }
+
     const year = new Date().getFullYear();
     const rand = Math.floor(Math.random() * 9000) + 1000;
     const newId = meta.id || `INS-${year}-${rand}`;

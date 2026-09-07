@@ -103,20 +103,16 @@ export default function NewInspectionPage() {
       setUploadedImages(files);
     }
 
-    if (createInspection) {
-      createInspection(
-        {
-          productName: productName.trim() || undefined,
-          location,
-          officer: officerName,
-          date,
-          time,
-          referenceNumber,
-          notes
-        },
-        files
-      );
-    }
+    // Store metadata for ProcessingPage to use when finalizing the inspection
+    sessionStorage.setItem('packcheck_inspect_meta', JSON.stringify({
+      productName: productName.trim() || undefined,
+      location,
+      officer: officerName,
+      date,
+      time,
+      referenceNumber,
+      notes
+    }));
 
     navigate('/inspection/processing');
   };

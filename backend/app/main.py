@@ -49,6 +49,7 @@ from app.routes.images import router as images_router
 from app.routes.inspections import router as inspections_router
 from app.routes.reports import inspection_router as reports_inspection_router
 from app.routes.reports import report_router
+from app.routes.inspect import router as inspect_router
 from app.services.auth import ensure_demo_user
 from app.services.report import REPORTS_DIR
 
@@ -123,6 +124,7 @@ app.include_router(evidence_inspection_router)
 app.include_router(evidence_router)
 app.include_router(reports_inspection_router)
 app.include_router(report_router)
+app.include_router(inspect_router)
 
 # ---------------------------------------------------------------------------
 # Built-in utility routes
