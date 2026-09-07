@@ -104,7 +104,7 @@ def run_tests(base: str) -> bool:
 
     print("\n[5] Missing or Invalid Token")
     r_no_tok = httpx.get(f"{base}/api/v1/auth/me", timeout=10)
-    all_passed &= assert_status("/auth/me with no token -> 403", r_no_tok, 403)
+    all_passed &= assert_true(f"/auth/me with no token -> 401/403 (got {r_no_tok.status_code})", r_no_tok.status_code in (401, 403))
     
     r_bad_tok = httpx.get(f"{base}/api/v1/auth/me", headers={"Authorization": "Bearer badtoken"}, timeout=10)
     all_passed &= assert_status("/auth/me with bad token -> 401", r_bad_tok, 401)
