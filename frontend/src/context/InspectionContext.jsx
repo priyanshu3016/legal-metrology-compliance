@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { mockInspections } from '../data/mockInspections';
+import { inspectionService } from '../services/api';
 
 export const InspectionContext = createContext(null);
 
@@ -22,6 +23,43 @@ export function InspectionProvider({ children }) {
 
   const [uploadedImages, setUploadedImages] = useState([]);
   const [remarks, setRemarks] = useState({});
+
+  // Fetch persisted inspections from backend SQLite database
+  const refreshInspections = useCallback(async () => {
+    try {
+      const res = await inspectionService.getAll({ limit: 100 });
+      if (res && res.data && Array.isArray(res.data)) {
+        const backendList = res.data.map(item => ({
+          ...item,
+          id: item.reference_number || `INS-${item.id}`,
+          db_id: item.id,
+          reference_number: item.reference_number,
+          product: item.product_name || `Packaged Product #${item.product_id || item.id}`,
+          productName: item.product_name || `Packaged Product #${item.product_id || item.id}`,
+          manufacturer: item.manufacturer || 'Quality Packaged Goods',
+          date: item.created_at ? item.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+          score: item.compliance_score !== null && item.compliance_score !== undefined ? Math.round(item.compliance_score) : 0,
+          status: item.status ? (item.status === 'compliant' ? 'COMPLIANT' : item.status === 'non_compliant' ? 'VIOLATION' : item.status.toUpperCase()) : 'REVIEW_REQUIRED',
+          location: item.location || 'Central Facility',
+          officer: 'Inspector',
+        }));
+
+        if (backendList.length > 0) {
+          setInspections(prev => {
+            const ids = new Set(backendList.map(b => b.id));
+            const localOnly = prev.filter(p => !ids.has(p.id));
+            return [...backendList, ...localOnly];
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Could not fetch inspection history from backend API:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshInspections();
+  }, [refreshInspections]);
 
   useEffect(() => {
     try {
@@ -286,6 +324,7 @@ export function InspectionProvider({ children }) {
       startMockInspection,
       clearAllInspections,
       loadSampleData,
+      refreshInspections,
     }}>
       {children}
     </InspectionContext.Provider>

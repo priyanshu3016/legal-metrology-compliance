@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const filtered = inspections
     .filter(i =>
       (i.product || i.productName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (i.id || '').toLowerCase().includes(search.toLowerCase()) ||
+      String(i.id || '').toLowerCase().includes(search.toLowerCase()) ||
       (i.manufacturer || '').toLowerCase().includes(search.toLowerCase())
     )
     .slice(0, 6);

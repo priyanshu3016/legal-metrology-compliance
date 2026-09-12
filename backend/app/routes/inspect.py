@@ -8,12 +8,13 @@ and returns a structured result ready for the frontend.
 import os
 import sys
 import shutil
-import tempfile
 import time
+import uuid
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 # Ensure repo root, ai-engine, and rules-engine/legal-core are on sys.path
 _current_dir = Path(__file__).resolve().parent
@@ -28,6 +29,13 @@ for _path in [
         sys.path.insert(0, _path)
 
 from integration.orchestrator import run_full_inspection
+from app.database import get_db
+from app.models.inspection import Inspection
+from app.models.inspection_image import InspectionImage
+from app.models.declaration import Declaration
+from app.models.violation import Violation
+from app.models.product import Product
+from app.routes.images import UPLOADS_DIR
 
 router = APIRouter(prefix="/api/v1", tags=["Inspect"])
 
@@ -62,10 +70,11 @@ async def inspect_product(
     side_image: Optional[UploadFile] = File(None, description="Optional side view label image"),
     demo_mode: bool = Form(False, description="Use demo sample fallbacks if true"),
     use_rag: bool = Form(False, description="Enable legal citation RAG search if true"),
+    db: Session = Depends(get_db),
 ):
     """
     Accepts multipart packaging images, runs OCR and legal rules validation,
-    and returns a unified inspection result consumable by the frontend.
+    persists records to SQLite DB, and returns a unified inspection result.
     """
     start_time = time.time()
     
@@ -74,40 +83,76 @@ async def inspect_product(
     back_ext = _validate_image_file(back_image)
     side_ext = _validate_image_file(side_image) if (side_image and side_image.filename) else None
 
-    # Save uploads to a temporary directory with absolute paths
-    tmp_dir = tempfile.mkdtemp(prefix="lm_inspect_")
+    # Ensure uploads directory exists
+    UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 1. Create initial inspection record in SQLite database
+    ref_number = f"INSP-{time.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    inspection = Inspection(
+        reference_number=ref_number,
+        status="processing",
+    )
+    db.add(inspection)
+    db.commit()
+    db.refresh(inspection)
+
     try:
-        front_path = os.path.join(tmp_dir, f"front{front_ext}")
+        # Save front image permanently to uploads/
+        front_filename = f"inspection_{inspection.id}_{uuid.uuid4().hex}{front_ext}"
+        front_path = UPLOADS_DIR / front_filename
         with open(front_path, "wb") as f_out:
             shutil.copyfileobj(front_image.file, f_out)
 
-        back_path = os.path.join(tmp_dir, f"back{back_ext}")
+        db.add(InspectionImage(
+            inspection_id=inspection.id,
+            file_path=f"uploads/{front_filename}",
+            panel_type="front",
+        ))
+
+        # Save back image permanently to uploads/
+        back_filename = f"inspection_{inspection.id}_{uuid.uuid4().hex}{back_ext}"
+        back_path = UPLOADS_DIR / back_filename
         with open(back_path, "wb") as f_out:
             shutil.copyfileobj(back_image.file, f_out)
 
+        db.add(InspectionImage(
+            inspection_id=inspection.id,
+            file_path=f"uploads/{back_filename}",
+            panel_type="back",
+        ))
+
+        # Save side image permanently to uploads/ if present
         side_path = None
         if side_image and side_image.filename and side_ext:
-            side_path = os.path.join(tmp_dir, f"side{side_ext}")
+            side_filename = f"inspection_{inspection.id}_{uuid.uuid4().hex}{side_ext}"
+            side_path = UPLOADS_DIR / side_filename
             with open(side_path, "wb") as f_out:
                 shutil.copyfileobj(side_image.file, f_out)
 
-        # Run pipeline via integration orchestrator
+            db.add(InspectionImage(
+                inspection_id=inspection.id,
+                file_path=f"uploads/{side_filename}",
+                panel_type="side",
+            ))
+
+        db.commit()
+
+        # Run pipeline via integration orchestrator using persistent file paths
         result = run_full_inspection(
-            front_path=front_path,
-            back_path=back_path,
-            side_path=side_path,
+            front_path=str(front_path.resolve()),
+            back_path=str(back_path.resolve()),
+            side_path=str(side_path.resolve()) if side_path else None,
             demo_mode=demo_mode,
             use_rag=use_rag,
         )
 
     except Exception as exc:
+        inspection.status = "failed"
+        db.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Inspection pipeline execution error: {str(exc)}"
         )
-    finally:
-        # Clean up temporary disk files
-        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     if not result:
         raise HTTPException(
@@ -261,11 +306,67 @@ async def inspect_product(
             except Exception:
                 pass
 
+    # 2. Persist Declarations to DB
+    for det in detections:
+        f_name = det.get("field")
+        val = det.get("value")
+        raw_conf = det.get("confidence", 0.0) or 0.0
+        if f_name:
+            decl = Declaration(
+                inspection_id=inspection.id,
+                field_name=f_name,
+                value=str(val) if val is not None else None,
+                confidence=round(raw_conf, 4) if raw_conf else None,
+                status="extracted" if val else "missing",
+            )
+            db.add(decl)
+
+    # 3. Create and link Product record if title exists
+    if product_title and product_title != "Packaged Commodity Item":
+        prod = Product(
+            name=product_title,
+            manufacturer=manufacturer_val or None,
+        )
+        db.add(prod)
+        db.flush()
+        inspection.product_id = prod.id
+
+    # 4. Persist Violations to DB
+    for chk in compliance.get("checks", []):
+        if chk.get("status") == "FAIL":
+            chk_id = chk.get("check_id") or "CHK"
+            rule_name = chk.get("rule_name") or "Mandatory Declaration Check"
+            reason = chk.get("reason") or rule_name
+            db.add(Violation(
+                inspection_id=inspection.id,
+                rule_id=None,
+                field_name=chk.get("field"),
+                severity=(chk.get("severity") or "medium").lower(),
+                description=f"[{chk_id}] {reason}",
+                confidence=chk.get("confidence"),
+                status="open",
+            ))
+
+    # 5. Update and finalize Inspection record
     total_time_ms = round((time.time() - start_time) * 1000)
     score = round(compliance.get("automated_check_score", 0.0), 1)
 
+    inspection.compliance_score = score
+    if mapped_status == "COMPLIANT":
+        inspection.status = "compliant"
+    elif mapped_status == "VIOLATION":
+        inspection.status = "non_compliant"
+    else:
+        inspection.status = "completed"
+
+    db.commit()
+    db.refresh(inspection)
+
     return {
-        "id": f"INS-{time.strftime('%Y')}-{int(time.time() * 1000) % 9000 + 1000}",
+        "id": ref_number,
+        "inspection_id": inspection.id,
+        "reference_number": ref_number,
+        "db_id": inspection.id,
         "status": mapped_status,
         "score": score,
         "confidence": 0.95,
@@ -295,3 +396,4 @@ async def inspect_product(
             "structuredFacts": result.get("structured_facts"),
         }
     }
+

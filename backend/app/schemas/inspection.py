@@ -172,6 +172,8 @@ class InspectionSummary(BaseModel):
     location: str | None = None
     inspector_id: int | None = None
     product_id: int | None = None
+    product_name: str | None = None
+    manufacturer: str | None = None
     status: str
     compliance_score: float | None = None
     created_at: datetime

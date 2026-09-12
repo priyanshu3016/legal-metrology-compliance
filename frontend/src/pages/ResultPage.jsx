@@ -77,14 +77,15 @@ export default function ResultPage() {
     licenseNumber: { value: inspection.licenseNumber || 'N/A', confidence: 96 },
   };
 
-  const complianceChecks = inspection.complianceChecks || (inspection.checks || []).map(c => ({
-    ruleName: c.name,
-    reference: c.ruleRef,
-    result: c.status,
+  const rawChecks = inspection.complianceChecks || inspection.checks || [];
+  const complianceChecks = rawChecks.map(c => ({
+    ruleName: c.ruleName || c.name || 'Compliance Check',
+    reference: c.reference || c.ruleRef || 'Legal Metrology Rules',
+    result: (c.result || c.status || 'PASS').toUpperCase(),
     confidence: typeof c.confidence === 'number' && c.confidence <= 1 ? Math.round(c.confidence * 100) : (c.confidence || 95),
     detectedValue: c.detectedValue,
-    expectedValue: c.expectedRequirement,
-    explanation: c.explanation
+    expectedValue: c.expectedValue || c.expectedRequirement || 'Standard requirement',
+    explanation: c.explanation || c.reason || ''
   }));
 
   const boundingBoxes = inspection.boundingBoxes && inspection.boundingBoxes.length > 0
@@ -235,18 +236,21 @@ export default function ResultPage() {
           <div className="space-y-4">
             {complianceChecks?.map((check, idx) => {
               const isExpanded = expandedCheck === idx;
-              const CheckIcon = check.result === 'PASS' ? CheckCircle : check.result === 'FAIL' ? XCircle : AlertTriangle;
+              const checkResult = (check.result || check.status || 'PASS').toUpperCase();
+              const CheckIcon = checkResult === 'PASS' ? CheckCircle : checkResult === 'FAIL' ? XCircle : AlertTriangle;
+              const ruleTitle = check.ruleName || check.name || 'Compliance Check';
+              const ruleRef = check.reference || check.ruleRef || '';
               return (
                 <Card key={idx} className="overflow-hidden">
                   <div className="p-4 flex items-center justify-between bg-gray-50">
                     <div className="flex items-center gap-4 flex-1">
                       <CheckIcon className={`w-6 h-6 ${
-                        check.result === 'PASS' ? 'text-green-500' : 
-                        check.result === 'FAIL' ? 'text-red-500' : 'text-amber-500'
+                        checkResult === 'PASS' ? 'text-green-500' : 
+                        checkResult === 'FAIL' ? 'text-red-500' : 'text-amber-500'
                       }`} />
                       <div>
-                        <h3 className="font-semibold text-gray-900">{check.ruleName}</h3>
-                        <p className="text-sm text-gray-500">{check.reference}</p>
+                        <h3 className="font-semibold text-gray-900">{ruleTitle}</h3>
+                        <p className="text-sm text-gray-500">{ruleRef}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">

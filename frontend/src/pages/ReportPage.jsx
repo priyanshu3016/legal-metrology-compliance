@@ -7,7 +7,18 @@ import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/States';
 import { formatConfidence, getStatusLabel } from '../utils';
 
-import { mockInspections } from '../data/mockInspections';
+function resolveImageUrl(img) {
+  if (!img) return '';
+  const path = typeof img === 'string' ? img : (img.file_path || img.url || img.path || img.preview || '');
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const backendUrl = apiBase.replace(/\/api(\/v1)?\/?$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${backendUrl}${cleanPath}`;
+}
 
 export default function ReportPage() {
   const navigate = useNavigate();
@@ -31,36 +42,40 @@ export default function ReportPage() {
     );
   }
 
-  const id = raw.id || 'INS-2026-0001';
+  const id = raw.id || raw.reference_number || 'INS-2026-0001';
   const status = raw.status || 'COMPLIANT';
-  const productName = raw.product || raw.productName || 'Basmati Rice Premium';
+  const productName = raw.product_name || raw.productName || raw.product || 'N/A';
   const timestamp = raw.timestamp || `${raw.date || '2026-08-15'} ${raw.time || '10:30'}`;
-  const score = raw.score ?? 95;
+  const score = raw.score ?? (raw.compliance_score !== null && raw.compliance_score !== undefined ? Math.round(raw.compliance_score) : 95);
   const officerName = raw.officer || raw.officerName || 'Rajesh Kumar';
 
+  const manufacturer = raw.manufacturer || raw.extractedData?.manufacturer?.value || (typeof raw.extractedData?.manufacturer === 'string' ? raw.extractedData.manufacturer : null) || 'N/A';
+
   const extractedData = raw.extractedData || {
-    manufacturer: { value: raw.manufacturer || 'Agro Farms India Pvt. Ltd.' },
-    netQuantity: { value: raw.netQuantity || '5kg' },
-    mrp: { value: raw.mrp || '₹850' },
-    packedDate: { value: raw.packedDate || 'July 2026' },
-    batchNumber: { value: raw.batchNumber || 'BR-2607-452' },
+    manufacturer: { value: manufacturer },
+    netQuantity: { value: raw.netQuantity || 'N/A' },
+    mrp: { value: raw.mrp || 'N/A' },
+    packedDate: { value: raw.packedDate || 'N/A' },
+    batchNumber: { value: raw.batchNumber || 'N/A' },
   };
 
-  const complianceChecks = raw.complianceChecks || (raw.checks || []).map(c => ({
-    ruleName: c.name,
-    reference: c.ruleRef,
-    result: c.status,
-    explanation: c.explanation
+  const rawChecks = raw.complianceChecks || raw.checks || [];
+  const complianceChecks = rawChecks.map(c => ({
+    ruleName: c.ruleName || c.name || 'Unknown Rule',
+    reference: c.reference || c.ruleRef || '',
+    result: (c.result || c.status || 'UNKNOWN').toUpperCase(),
+    explanation: c.explanation || c.reason || c.description || ''
   }));
 
   const violations = (raw.violations || []).map(v => ({
-    title: v.title || 'Legal Metrology Violation',
-    reference: v.ruleRef || v.reference || 'PC Rules, Rule 6',
+    title: v.title || `${v.ruleRef || v.rule_name || 'Rule'} Non-Compliance`,
+    reference: v.ruleRef || v.reference || 'Legal Metrology Rules',
     description: v.explanation || v.description || 'Non-compliance detected.',
     recommendedAction: v.recommendedAction || 'Direct corrective action under Legal Metrology Rules.'
   }));
 
-  const officerRemarks = raw.officerRemarks || (raw.notes || '');
+  const officerRemarks = raw.officerRemarks || raw.notes || '';
+  const imagesToDisplay = Array.isArray(raw.images) && raw.images.length > 0 ? raw.images.slice(0, 2) : [];
 
   const handlePrint = () => {
     window.print();
@@ -131,19 +146,19 @@ export default function ReportPage() {
               </tr>
               <tr>
                 <th className="border border-gray-300 p-2 text-left bg-gray-50">Manufacturer/Packer</th>
-                <td className="border border-gray-300 p-2">{extractedData?.manufacturer?.value || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{manufacturer}</td>
               </tr>
               <tr>
                 <th className="border border-gray-300 p-2 text-left bg-gray-50">Net Quantity</th>
-                <td className="border border-gray-300 p-2">{extractedData?.netQuantity?.value || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{extractedData?.netQuantity?.value || raw.netQuantity || 'N/A'}</td>
               </tr>
               <tr>
                 <th className="border border-gray-300 p-2 text-left bg-gray-50">MRP</th>
-                <td className="border border-gray-300 p-2">{extractedData?.mrp?.value || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{extractedData?.mrp?.value || raw.mrp || 'N/A'}</td>
               </tr>
               <tr>
                 <th className="border border-gray-300 p-2 text-left bg-gray-50">Packed Date / Batch</th>
-                <td className="border border-gray-300 p-2">{extractedData?.packedDate?.value || 'N/A'} / {extractedData?.batchNumber?.value || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{(extractedData?.packedDate?.value || raw.packedDate || 'N/A')} / {(extractedData?.batchNumber?.value || raw.batchNumber || 'N/A')}</td>
               </tr>
             </tbody>
           </table>
@@ -164,17 +179,17 @@ export default function ReportPage() {
               {complianceChecks?.map((check, idx) => (
                 <tr key={idx}>
                   <td className="border border-gray-300 p-2">
-                    <strong>{check.ruleName}</strong>
-                    <div className="text-xs text-gray-500">{check.reference}</div>
+                    <strong>{check.ruleName || check.name || 'Unknown Rule'}</strong>
+                    <div className="text-xs text-gray-500">{check.reference || check.ruleRef}</div>
                   </td>
                   <td className={`border border-gray-300 p-2 text-center font-bold ${
-                    check.result === 'PASS' ? 'text-green-600' : 
-                    check.result === 'FAIL' ? 'text-red-600' : 'text-amber-600'
+                    (check.result || check.status) === 'PASS' ? 'text-green-600' : 
+                    (check.result || check.status) === 'FAIL' ? 'text-red-600' : 'text-amber-600'
                   }`}>
-                    {check.result}
+                    {check.result || check.status || 'UNKNOWN'}
                   </td>
                   <td className="border border-gray-300 p-2 text-xs">
-                    {check.explanation}
+                    {check.explanation || 'N/A'}
                   </td>
                 </tr>
               ))}
@@ -202,14 +217,38 @@ export default function ReportPage() {
         {/* Evidence Section */}
         <div className="mb-8 print:break-inside-avoid">
           <h3 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-300 pb-1">4. Image Evidence</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-40 bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-400 text-sm">
-              [Image 1: Front Package]
+          {imagesToDisplay.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {imagesToDisplay.map((img, idx) => {
+                const src = resolveImageUrl(img);
+                const panelLabel = typeof img === 'object' && img.panel_type
+                  ? `Image ${idx + 1}: ${img.panel_type.charAt(0).toUpperCase() + img.panel_type.slice(1)} Package`
+                  : `Image ${idx + 1}`;
+                return (
+                  <div key={idx} className="border border-gray-300 rounded overflow-hidden">
+                    <img
+                      src={src}
+                      alt={panelLabel}
+                      className="w-full h-40 object-cover"
+                      crossOrigin="anonymous"
+                    />
+                    <div className="bg-gray-50 px-2 py-1 text-xs text-gray-600 text-center border-t border-gray-200 font-medium">
+                      {panelLabel}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="h-40 bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-400 text-sm">
-              [Image 2: Back Package]
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="h-40 bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                [Image 1: Front Package]
+              </div>
+              <div className="h-40 bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-400 text-sm">
+                [Image 2: Back Package]
+              </div>
             </div>
-          </div>
+          )}
           <p className="text-xs text-gray-500 mt-2">Images attached to digital record. Bounding box overlays available in system.</p>
         </div>
 

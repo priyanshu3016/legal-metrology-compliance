@@ -17,17 +17,30 @@ import {
 
 import { Button } from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Badge, StatusBadge } from '../components/ui/Badge';
+import { Badge, StatusBadge, ConfidenceBadge } from '../components/ui/Badge';
 import { ErrorState, EmptyState } from '../components/ui/States';
 import { CircularProgress } from '../components/ui/ProgressBar';
 import { useInspection } from '../context/InspectionContext';
 import { mockInspections } from '../data/mockInspections';
 import { cn } from '../utils';
 
+function resolveImageUrl(img) {
+  if (!img) return '';
+  const path = typeof img === 'string' ? img : (img.file_path || img.url || img.path || img.preview || '');
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const backendUrl = apiBase.replace(/\/api(\/v1)?\/?$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${backendUrl}${cleanPath}`;
+}
+
 function CheckCard({ check }) {
   const [expanded, setExpanded] = useState(false);
   
-  const statusUpper = (check.status || '').toUpperCase();
+  const statusUpper = (check.status || check.result || '').toUpperCase();
   const isPass = statusUpper === 'PASS';
   const isFail = statusUpper === 'FAIL';
   
@@ -37,10 +50,10 @@ function CheckCard({ check }) {
                      isFail ? 'text-red-600 bg-red-50' : 
                      'text-amber-600 bg-amber-50';
 
-  const ruleTitle = check.name || check.rule || check.ruleRef || 'Compliance Check';
-  const description = check.explanation || check.description || check.expectedRequirement || '';
+  const ruleTitle = check.name || check.ruleName || check.rule || check.ruleRef || 'Compliance Check';
+  const description = check.explanation || check.description || check.expectedRequirement || check.reason || '';
   const extractedValue = check.detectedValue || check.extractedValue || 'N/A';
-  const expectedFormat = check.expectedRequirement || check.expectedFormat || 'Standard Legal Metrology format';
+  const expectedFormat = check.expectedRequirement || check.expectedValue || check.expectedFormat || 'Standard Legal Metrology format';
   const confidence = check.confidence !== undefined ? Math.round(check.confidence <= 1 ? check.confidence * 100 : check.confidence) : 95;
 
   return (
@@ -88,7 +101,7 @@ export default function InspectionDetailPage() {
   const { inspections = [] } = useInspection();
   const [activeTab, setActiveTab] = useState('overview');
   
-  const inspection = inspections.find(i => i.id === id) || mockInspections.find(i => i.id === id);
+  const inspection = inspections.find(i => i.id === id || i.reference_number === id || String(i.db_id) === id) || mockInspections.find(i => i.id === id);
   
   if (!inspection) {
     return (
@@ -240,17 +253,20 @@ export default function InspectionDetailPage() {
 
         {activeTab === 'checks' && (
           <div className="space-y-4">
-            {inspection.checks && inspection.checks.length > 0 ? (
-              inspection.checks.map((check, idx) => (
-                <CheckCard key={idx} check={check} />
-              ))
-            ) : (
-              <EmptyState 
-                title="No checks recorded"
-                description="Detailed compliance checks are not available for this inspection."
-                icon={<CheckCircle className="w-8 h-8 text-gray-400" />}
-              />
-            )}
+            {(() => {
+              const checksList = inspection.checks || inspection.complianceChecks || [];
+              return checksList.length > 0 ? (
+                checksList.map((check, idx) => (
+                  <CheckCard key={idx} check={check} />
+                ))
+              ) : (
+                <EmptyState 
+                  title="No checks recorded"
+                  description="Detailed compliance checks are not available for this inspection."
+                  icon={<CheckCircle className="w-8 h-8 text-gray-400" />}
+                />
+              );
+            })()}
           </div>
         )}
 
@@ -294,14 +310,35 @@ export default function InspectionDetailPage() {
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {inspection.images && inspection.images.length > 0 ? (
-                    inspection.images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 group flex items-center justify-center">
-                        <ImageIcon className="w-12 h-12 text-gray-300" />
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="secondary" size="sm">View Panel {idx + 1}</Button>
+                    inspection.images.map((img, idx) => {
+                      const src = resolveImageUrl(img);
+                      return (
+                        <div key={idx} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 group flex items-center justify-center">
+                          {src ? (
+                            <img 
+                              src={src} 
+                              alt={`Evidence ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                              crossOrigin="anonymous"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <ImageIcon className="w-12 h-12 text-gray-300" />
+                          )}
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            {src ? (
+                              <a href={src} target="_blank" rel="noopener noreferrer">
+                                <Button variant="secondary" size="sm">View Panel {idx + 1}</Button>
+                              </a>
+                            ) : (
+                              <Button variant="secondary" size="sm">View Panel {idx + 1}</Button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="col-span-full py-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
                       <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
@@ -328,22 +365,41 @@ export default function InspectionDetailPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {(() => {
-                        const fields = inspection.detectedFields && inspection.detectedFields.length > 0
-                          ? inspection.detectedFields
-                          : Object.entries(inspection.ocrConfidence || {}).map(([key, conf]) => ({
-                              type: key.replace(/_/g, ' ').toUpperCase(),
-                              text: inspection[key.replace(/_([a-z])/g, (_, c) => c.toUpperCase())] || inspection[key] || 'Detected',
-                              confidence: Math.round(conf <= 1 ? conf * 100 : conf)
-                            }));
+                        let fields = [];
+                        if (inspection.detectedFields && inspection.detectedFields.length > 0) {
+                          fields = inspection.detectedFields;
+                        } else if (inspection.ocrConfidence) {
+                          const seen = new Set();
+                          for (const [key, conf] of Object.entries(inspection.ocrConfidence)) {
+                            const normalizedType = key
+                              .replace(/([A-Z])/g, '_$1')
+                              .replace(/_/g, ' ')
+                              .trim()
+                              .toUpperCase();
+                            if (seen.has(normalizedType)) continue;
+                            seen.add(normalizedType);
+
+                            const camelKey = key.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+                            const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+                            const rawVal = inspection[camelKey] || inspection[snakeKey] || inspection[key];
+                            const text = typeof rawVal === 'object' && rawVal !== null
+                              ? (rawVal.value || JSON.stringify(rawVal))
+                              : (rawVal || 'Detected');
+
+                            fields.push({
+                              type: normalizedType,
+                              text: String(text),
+                              confidence: conf
+                            });
+                          }
+                        }
                         return fields.length > 0 ? (
                           fields.map((field, idx) => (
                             <tr key={idx}>
                               <td className="px-4 py-3 font-medium text-gray-900">{field.type}</td>
                               <td className="px-4 py-3 text-gray-700">{field.text}</td>
                               <td className="px-4 py-3">
-                                <Badge variant={field.confidence >= 90 ? 'success' : field.confidence >= 70 ? 'warning' : 'danger'}>
-                                  {field.confidence}%
-                                </Badge>
+                                <ConfidenceBadge confidence={field.confidence} />
                               </td>
                             </tr>
                           ))

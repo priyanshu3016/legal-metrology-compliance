@@ -92,6 +92,14 @@ class Inspection(Base):
         cascade="all, delete-orphan",
     )
 
+    @property
+    def product_name(self) -> str | None:
+        return self.product.name if self.product else None
+
+    @property
+    def manufacturer(self) -> str | None:
+        return self.product.manufacturer if self.product else None
+
     def __repr__(self) -> str:
         return (
             f"<Inspection id={self.id} ref={self.reference_number!r} "

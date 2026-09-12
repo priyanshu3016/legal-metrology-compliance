@@ -48,7 +48,7 @@ export default function HistoryPage() {
       const searchLower = search.toLowerCase();
       const prod = (item.product || item.productName || '').toLowerCase();
       const mfr = (item.manufacturer || '').toLowerCase();
-      const id = (item.id || '').toLowerCase();
+      const id = String(item.id || '').toLowerCase();
       if (search && !id.includes(searchLower) && !prod.includes(searchLower) && !mfr.includes(searchLower)) {
         return false;
       }

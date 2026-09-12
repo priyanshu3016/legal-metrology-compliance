@@ -20,6 +20,19 @@ import { formatConfidence, getConfidenceColor } from '../utils';
 
 import { mockInspections } from '../data/mockInspections';
 
+function resolveImageUrl(img) {
+  if (!img) return '';
+  const path = typeof img === 'string' ? img : (img.file_path || img.url || img.path || img.preview || '');
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const backendUrl = apiBase.replace(/\/api(\/v1)?\/?$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${backendUrl}${cleanPath}`;
+}
+
 export default function EvidencePage() {
   const navigate = useNavigate();
   const { currentInspection, inspections } = useInspection();
@@ -72,12 +85,18 @@ export default function EvidencePage() {
     }
   };
 
-  // Mock multiple images for prototype
-  const images = [
-    { id: 1, label: 'Front Package Panel', url: null },
-    { id: 2, label: 'Back Nutrition & Care Panel', url: null },
-    { id: 3, label: 'Side Net Wt & Batch Panel', url: null }
-  ];
+  // Dynamically resolve images from inspection or fallback to placeholders
+  const images = raw.images && raw.images.length > 0
+    ? raw.images.map((img, idx) => ({
+        id: idx + 1,
+        label: idx === 0 ? 'Front Package Panel' : idx === 1 ? 'Back Package Panel' : `Panel ${idx + 1}`,
+        url: resolveImageUrl(img)
+      }))
+    : [
+        { id: 1, label: 'Front Package Panel', url: null },
+        { id: 2, label: 'Back Nutrition & Care Panel', url: null },
+        { id: 3, label: 'Side Net Wt & Batch Panel', url: null }
+      ];
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -135,8 +154,17 @@ export default function EvidencePage() {
               <Badge variant="neutral">{currentImageIndex + 1} of {images.length}</Badge>
             </div>
             
-            <div className="relative w-full aspect-video bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden mb-4">
-              <span className="text-gray-400 font-medium text-lg">{images[currentImageIndex].label} Image Placeholder</span>
+            <div className={`relative w-full bg-gray-100 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden mb-4 ${!images[currentImageIndex].url ? 'aspect-video' : ''}`}>
+              {images[currentImageIndex].url ? (
+                <img 
+                  src={images[currentImageIndex].url} 
+                  alt={images[currentImageIndex].label} 
+                  className="w-full h-auto block rounded-lg"
+                  crossOrigin="anonymous"
+                />
+              ) : (
+                <span className="text-gray-400 font-medium text-lg">{images[currentImageIndex].label} Image Placeholder</span>
+              )}
               {/* Overlay mock bounding boxes on the first image */}
               {currentImageIndex === 0 && inspection.boundingBoxes?.map((box, idx) => (
                 <div 
