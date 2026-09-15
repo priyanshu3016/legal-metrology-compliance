@@ -82,7 +82,7 @@ export const initialNotifications = [
   {
     id: 'notif-004',
     title: 'System Update',
-    message: 'New features and updated Legal Metrology rules have been added to PackCheck AI.',
+    message: 'New features and updated Legal Metrology rules have been added to Nirikshan.',
     time: '1d ago',
     read: true,
     type: 'system'

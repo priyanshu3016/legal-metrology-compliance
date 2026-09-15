@@ -1,4 +1,4 @@
-// Utility functions for PackCheck AI
+// Utility functions for Nirikshan
 
 export const formatDate = (dateStr) => {
   if (!dateStr) return 'N/A';

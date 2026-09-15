@@ -203,7 +203,7 @@ export default function SettingsPage() {
                   <div className="flex items-center justify-between py-3 border-b border-gray-50">
                     <div>
                       <h4 className="text-sm font-medium text-gray-900">System updates</h4>
-                      <p className="text-sm text-gray-500 mt-0.5">News about PackCheck AI features and maintenance.</p>
+                      <p className="text-sm text-gray-500 mt-0.5">News about Nirikshan features and maintenance.</p>
                     </div>
                     <Toggle enabled={notifs.updates} onChange={v => setNotifs({...notifs, updates: v})} />
                   </div>

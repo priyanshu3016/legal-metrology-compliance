@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, FileText, BookOpen, Settings, LogOut, Shield, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, FileText, BookOpen, Settings, LogOut, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import nirikshanLogo from '../../assets/nirikshan-logo.png';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -38,11 +39,13 @@ export function Sidebar({ collapsed, onToggle }) {
         {!collapsed ? (
           <>
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 bg-[#8338EC] rounded-lg flex items-center justify-center shrink-0">
-                <Shield size={16} className="text-white" />
-              </div>
+              <img 
+                src={nirikshanLogo} 
+                alt="Nirikshan Logo" 
+                className="w-8 h-8 rounded-lg object-contain shrink-0" 
+              />
               <div className="min-w-0">
-                <p className="text-sm font-bold text-white leading-tight">PackCheck AI</p>
+                <p className="text-sm font-bold text-white leading-tight">Nirikshan</p>
                 <p className="text-xs text-slate-400 leading-tight">Legal Metrology</p>
               </div>
             </div>
@@ -58,11 +61,15 @@ export function Sidebar({ collapsed, onToggle }) {
         ) : (
           <button
             onClick={onToggle}
-            className="w-8 h-8 bg-[#8338EC] hover:bg-[#7126dc] active:bg-[#5d19bf] rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8338EC] focus:ring-offset-2 focus:ring-offset-[#212529] group"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8338EC] focus:ring-offset-2 focus:ring-offset-[#212529] group overflow-hidden"
             title="Expand sidebar"
             aria-label="Expand sidebar"
           >
-            <Shield size={16} className="text-white transition-transform group-hover:scale-105" />
+            <img 
+              src={nirikshanLogo} 
+              alt="Nirikshan Logo" 
+              className="w-8 h-8 rounded-lg object-contain transition-transform group-hover:scale-105" 
+            />
           </button>
         )}
       </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Shield, 
   Check, 
   ArrowRight, 
   FileText, 
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import mountainBg from '../assets/mountain-bg.jpg';
+import nirikshanLogo from '../assets/nirikshan-logo.png';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -48,14 +48,16 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 bg-[#212529] text-white h-16 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
           
-          {/* FAR LEFT: PackCheck AI Logo + Name */}
+          {/* FAR LEFT: Nirikshan Logo + Name */}
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded bg-[#8338EC] flex items-center justify-center text-white shadow-xs">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <img 
+              src={nirikshanLogo} 
+              alt="Nirikshan Logo" 
+              className="w-8 h-8 rounded-lg object-contain shrink-0" 
+            />
             <div className="flex flex-col">
               <span className="text-base font-bold tracking-tight text-white leading-tight">
-                PackCheck <span className="text-[#8338EC]">AI</span>
+                Nirikshan
               </span>
               <span className="text-[10px] font-medium tracking-wider text-slate-400 uppercase">
                 Legal Metrology Platform
@@ -371,7 +373,7 @@ export default function LandingPage() {
                   EXAMPLE COMPLIANCE CHECK
                 </h3>
                 <p className="text-sm sm:text-base text-slate-300">
-                  See how PackCheck AI presents the result after an inspection has been completed.
+                  See how Nirikshan presents the result after an inspection has been completed.
                 </p>
               </div>
             </div>
@@ -521,9 +523,13 @@ export default function LandingPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center md:text-left">
-            <div className="font-bold text-white flex items-center justify-center md:justify-start gap-1.5">
-              <Shield className="w-4 h-4 text-[#8338EC]" />
-              PackCheck AI
+            <div className="font-bold text-white flex items-center justify-center md:justify-start gap-2">
+              <img 
+                src={nirikshanLogo} 
+                alt="Nirikshan Logo" 
+                className="w-5 h-5 rounded object-contain shrink-0" 
+              />
+              Nirikshan
             </div>
             <div className="text-xs text-slate-400">
               Legal Metrology Compliance Platform

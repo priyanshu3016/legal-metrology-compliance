@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Scale, Shield, Eye, EyeOff, Loader2, Lock, ArrowLeft } from 'lucide-react';
+import { Shield, Eye, EyeOff, Loader2, Lock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import mountainBg from '../assets/mountain-bg.jpg';
+import nirikshanLogo from '../assets/nirikshan-logo.png';
 
 export default function LoginPage() {
   const [officerName, setOfficerName] = useState('');
@@ -73,15 +74,17 @@ export default function LoginPage() {
           to="/" 
           className="inline-flex items-center gap-2.5 text-white hover:opacity-90 transition-opacity group"
         >
-          <div className="w-9 h-9 rounded-lg bg-[#8338EC] text-white flex items-center justify-center shadow-xs">
-            <Scale className="w-5 h-5" />
-          </div>
+          <img 
+            src={nirikshanLogo} 
+            alt="Nirikshan Logo" 
+            className="w-9 h-9 rounded-lg object-contain shrink-0" 
+          />
           <div className="flex flex-col">
             <span className="font-extrabold text-sm sm:text-base tracking-wider uppercase text-white font-sans">
               Legal Metrology
             </span>
             <span className="text-[10px] text-slate-300 font-medium tracking-tight -mt-0.5">
-              PackCheck AI &bull; Enforcement Portal
+              Nirikshan &bull; Enforcement Portal
             </span>
           </div>
         </Link>
