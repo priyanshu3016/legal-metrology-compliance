@@ -29,6 +29,66 @@ import {
 
 import { mockInspections } from '../data/mockInspections';
 
+function resolveImageUrl(img) {
+  if (!img) return '';
+  const path = typeof img === 'string' ? img : (img.file_path || img.url || img.path || img.preview || '');
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const backendUrl = apiBase.replace(/\/api(\/v1)?\/?$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${backendUrl}${cleanPath}`;
+}
+
+const DISPLAY_LABELS = {
+  product_name: 'Product Name',
+  productName: 'Product Name',
+  manufacturer_packer_importer: 'Manufacturer',
+  manufacturer: 'Manufacturer',
+  packer: 'Packer',
+  net_quantity: 'Net Quantity',
+  netQuantity: 'Net Quantity',
+  mrp: 'MRP',
+  manufacturing_date: 'Packed Date',
+  packedDate: 'Packed Date',
+  packed_date: 'Packed Date',
+  best_before: 'Best Before',
+  bestBefore: 'Best Before',
+  consumer_care: 'Consumer Care',
+  consumerCare: 'Consumer Care',
+  country_of_origin: 'Country of Origin',
+  countryOfOrigin: 'Country of Origin',
+  unit_sale_price: 'Unit Sale Price',
+  unitSalePrice: 'Unit Sale Price',
+  batch_number: 'Batch Number',
+  batchNumber: 'Batch Number',
+  license_number: 'License Number',
+  licenseNumber: 'License Number',
+};
+
+const CANONICAL_FIELD_MAP = {
+  manufacturer: 'manufacturer_packer_importer',
+  packed_date: 'manufacturing_date',
+  packeddate: 'manufacturing_date',
+};
+
+const normalizeKey = (k) => {
+  const norm = k.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+  return CANONICAL_FIELD_MAP[norm] || norm;
+};
+
+const humanize = (k) => {
+  if (DISPLAY_LABELS[k]) return DISPLAY_LABELS[k];
+  if (k.toLowerCase() === 'mrp') return 'MRP';
+  return k
+    .replace(/_/g, ' ')
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 export default function ResultPage() {
   const navigate = useNavigate();
   const { currentInspection, inspections } = useInspection();
@@ -76,6 +136,20 @@ export default function ResultPage() {
     batchNumber: { value: inspection.batchNumber || 'N/A', confidence: 97 },
     licenseNumber: { value: inspection.licenseNumber || 'N/A', confidence: 96 },
   };
+
+  const dedupedExtracted = (() => {
+    const seen = new Set();
+    return Object.entries(extractedData || {}).filter(([key]) => {
+      const norm = normalizeKey(key);
+      if (seen.has(norm)) return false;
+      seen.add(norm);
+      return true;
+    });
+  })();
+
+  const rawImages = inspection.images || inspection.raw?.images || [];
+  const firstImage = rawImages.length > 0 ? rawImages[0] : null;
+  const firstImageUrl = firstImage ? resolveImageUrl(firstImage) : null;
 
   const rawChecks = inspection.complianceChecks || inspection.checks || [];
   const complianceChecks = rawChecks.map(c => ({
@@ -213,10 +287,10 @@ export default function ResultPage() {
       <div className="mt-6">
         {activeTab === 'extracted' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(extractedData || {}).map(([key, data]) => (
+            {dedupedExtracted.map(([key, data]) => (
               <Card key={key} className="p-4 flex items-start justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{humanize(key)}</h3>
                   <p className={`mt-1 text-base font-semibold ${!data?.value ? 'text-gray-400 italic' : data.value === 'N/A' ? 'text-slate-500' : 'text-gray-900'}`}>
                     {data?.value || 'Not Detected'}
                   </p>
@@ -291,10 +365,10 @@ export default function ResultPage() {
             <Card className="p-6">
               <h2 className="text-lg font-semibold mb-6">Field Extraction Confidence</h2>
               <div className="space-y-6">
-                {Object.entries(extractedData || {}).map(([key, data]) => (
+                {dedupedExtracted.map(([key, data]) => (
                   <div key={key}>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                      <span className="text-sm font-medium text-gray-700">{humanize(key)}</span>
                       <span className="text-sm font-semibold">{formatConfidence(data?.confidence)}</span>
                     </div>
                     <ProgressBar 
@@ -318,7 +392,16 @@ export default function ResultPage() {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="flex-1">
                 <div className="relative w-full aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                  <span className="text-gray-400 font-medium">Package Image</span>
+                  {firstImageUrl ? (
+                    <img 
+                      src={firstImageUrl} 
+                      alt="Package" 
+                      className="w-full h-full object-contain" 
+                      crossOrigin="anonymous" 
+                    />
+                  ) : (
+                    <span className="text-gray-400 font-medium">Package Image</span>
+                  )}
                   {boundingBoxes?.map((box, idx) => (
                     <div 
                       key={idx}
