@@ -34,5 +34,24 @@ export function ConfidenceBadge({ confidence }) {
   );
 }
 
-export const Badge = StatusBadge;
+const VARIANT_MAP = {
+  success: 'text-green-700 bg-green-50 border-green-200',
+  danger: 'text-red-700 bg-red-50 border-red-200',
+  warning: 'text-amber-700 bg-amber-50 border-amber-200',
+  primary: 'text-blue-700 bg-blue-50 border-blue-200',
+  neutral: 'text-slate-600 bg-slate-100 border-slate-200',
+};
+
+export function Badge({ variant, className = '', children, size = 'sm' }) {
+  const variantClass = variant
+    ? (VARIANT_MAP[variant] || 'text-slate-600 bg-slate-50 border-slate-200')
+    : (className ? '' : 'text-slate-600 bg-slate-50 border-slate-200');
+  const sizeClass = size === 'lg' ? 'px-3 py-1 text-sm font-semibold' : 'px-2 py-0.5 text-xs font-medium';
+  return (
+    <span className={`inline-flex items-center rounded-full border ${variantClass} ${sizeClass} ${className}`.trim()}>
+      {children}
+    </span>
+  );
+}
+
 export default StatusBadge;
